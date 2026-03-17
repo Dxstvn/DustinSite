@@ -1,120 +1,102 @@
-# Claude - Expert Full-Stack Developer
+# Jaspire — Premium Media Agency
 
-## Core Expertise
+## Project Overview
+Jaspire (jaspire.co) is a premium media agency offering web development, SEO, and social media management. This repo contains the agency website, deployed on Vercel via the `v0-jaspire-v4` project. Every push to `main` auto-deploys to jaspire.co.
 
-### Frontend Frameworks & Libraries
-- **React.js**: Component architecture, hooks, state management (Redux, Zustand, Context API), performance optimization
-- **Vue.js**: Composition API, Vuex, Vue Router, reactive programming patterns
-- **Next.js**: SSR/SSG/ISR, API routes, middleware, app router, performance optimization
-- **Nuxt.js**: Universal rendering, auto-imports, Nitro server, module ecosystem
-- **Angular**: TypeScript-first development, RxJS, dependency injection, enterprise patterns
-- **Svelte/SvelteKit**: Compiler-based optimization, stores, server-side rendering
+## Required Workflow
+- **Always invoke `/frontend-design` skill at the start of each conversation** when working on UI/design
+- Use `frontend-design-architect` agents for systematic multi-section/multi-page buildout
+- Use `/frontend-design` skill for individual creative sections (hero, CTA, key visuals)
 
-### Styling & UI Libraries
-- **Tailwind CSS**: Utility-first design, custom configurations, component patterns
-- **CSS-in-JS**: Styled-components, Emotion, CSS Modules
-- **UI Component Libraries**: Material-UI, Ant Design, Chakra UI, shadcn/ui, Headless UI
-- **Animation**: Framer Motion, GSAP, Lottie, CSS animations
-- **Responsive Design**: Mobile-first approach, fluid typography, container queries
+## Tech Stack
+- **Next.js 16** (App Router) + TypeScript
+- **pnpm** — always use pnpm, never npm or yarn
+- **Tailwind CSS 4** — config via `@theme` in CSS, no `tailwind.config.js`
+- **Motion** (formerly framer-motion) — import from `motion/react`
+- **shadcn/ui** — base component library
+- **21st.dev components** — downloaded as source, normalized to match our design system
+- **Vercel** — hosting + analytics
 
-### Testing Frameworks
-- **Vitest**: Unit testing, integration testing, coverage reports
-- **Jest**: Test suites, mocking, snapshot testing
-- **Cypress**: E2E testing, component testing, visual regression
-- **Playwright**: Cross-browser testing, API testing, mobile testing
-- **React Testing Library**: Component testing, user interaction simulation
-- **Storybook**: Component documentation, visual testing, interaction testing
+## Design Direction
 
-### Backend Technologies
-- **Node.js**: Express, Fastify, NestJS, microservices architecture
-- **Database**: PostgreSQL, MySQL, MongoDB, Redis, Prisma ORM, TypeORM
-- **Authentication**: JWT, OAuth 2.0, Auth0, Clerk, NextAuth, Supabase Auth
-- **API Design**: RESTful APIs, GraphQL, tRPC, WebSockets, Server-Sent Events
-- **Cloud Services**: AWS, Google Cloud, Azure, Vercel, Netlify, Railway
+### Aesthetic
+Dark-mode-first, motion-heavy, premium agency feel. No light mode toggle — dark only.
 
-### Development Tools & DevOps
-- **Version Control**: Git workflows, branch strategies, CI/CD pipelines
-- **Build Tools**: Vite, Webpack, Turbopack, esbuild, Rollup
-- **Package Management**: npm, yarn, pnpm, workspace management
-- **Docker**: Containerization, multi-stage builds, orchestration
-- **Monitoring**: Sentry, LogRocket, DataDog, New Relic
+### Primary Inspiration: Analogue Agency (analogueagency.com)
+- Full-viewport WebGL/animated hero with scroll-driven text animations
+- Floating glassmorphism pill navbar that adapts (glass on dark, dark solid on light)
+- Hero zoom-out scroll transition (dark hero shrinks into contained card on light background)
+- Work-as-proof: services shown through actual project mockups, not abstract icons
+- Immersive portfolio cards with branded pill overlays
+- Expertise page: massive bold typography filling viewport, then 4-column capability lists
+- Left sidebar scroll progress indicator (label + dot tracking position)
 
-## Specialized Capabilities
+### Secondary Inspiration: COLLINS (wearecollins.com)
+- Confident single-statement hero copy ("Rewrite your worth.")
+- Immediate social proof (award badges below hero)
+- Case studies: dark background, horizontal scrolling card carousel, "Shelf"/"Spines" view toggle
 
-### E-Commerce Solutions
-- **Platforms**: Shopify (Hydrogen, Liquid), WooCommerce, Medusa.js
-- **Payment Integration**: Stripe, PayPal, Square, cryptocurrency payments
-- **Cart Systems**: Custom cart implementations, abandoned cart recovery
-- **Inventory Management**: Real-time stock updates, multi-warehouse support
-- **Order Processing**: Fulfillment automation, shipping integrations
+### Tertiary Inspiration: Pentagram (pentagram.com)
+- Full-bleed hero carousel with massive typography overlaid on project images
+- Interactive inline dropdowns in hero text
+- Work-first philosophy: let visual output speak
 
-### SEO & Performance Optimization
-- **Technical SEO**: Meta tags, structured data, XML sitemaps, robots.txt
-- **Core Web Vitals**: LCP, FID, CLS optimization strategies
-- **Performance**: Code splitting, lazy loading, image optimization, CDN configuration
-- **Analytics**: Google Analytics 4, Google Tag Manager, custom event tracking
-- **A/B Testing**: Feature flags, experimentation frameworks
+### Key Design Patterns
+1. Hero scroll storytelling — text animates/reveals on scroll
+2. Floating pill navbar — glassmorphism on dark, solid on light
+3. Work-as-proof — show services through project mockups
+4. Confident copy — bold, declarative headlines
+5. Social proof badges — immediately below hero
+6. Immersive portfolio cards — full-bleed images with pill overlays
+7. Dark-to-light transitions — hero dark, content sections can alternate
 
-### Security Best Practices
-- **OWASP Top 10**: Protection against common vulnerabilities
-- **Input Validation**: Sanitization, XSS prevention, SQL injection prevention
-- **CORS & CSP**: Proper header configuration, security policies
-- **Rate Limiting**: DDoS protection, API throttling
-- **Encryption**: HTTPS, data encryption at rest and in transit
-- **Compliance**: GDPR, CCPA, PCI DSS considerations
+## Design System
 
-### Professional Development Standards
-- **Code Quality**: ESLint, Prettier, Husky pre-commit hooks
-- **Documentation**: JSDoc, TypeDoc, API documentation, README best practices
-- **Accessibility**: WCAG 2.1 AA compliance, ARIA patterns, keyboard navigation
-- **Internationalization**: i18n/l10n implementation, RTL support
-- **Design Systems**: Component libraries, design tokens, style guides
+### Colors
+- Background: `#0a0a0a`, Surface: `#111111`, `#1a1a1a`
+- Brand: `#7c6bf0` (electric purple)
+- Text: `#fafafa` primary, `#a3a3a3` secondary
+- Accents: Blue (Web Dev), Green (SEO), Orange (Social Media)
 
-## Project Workflow
+### Typography
+- Display: Cabinet Grotesk | Body: Satoshi | Mono: JetBrains Mono
 
-### Research & Planning
-- Analyze project requirements and business goals
-- Research optimal technology stack for specific needs
-- Evaluate third-party services and dependencies
-- Create technical specifications and architecture diagrams
+### Motion
+- Enter: fade up y:20→0, opacity:0→1, 0.5-0.8s
+- Micro-interactions: 0.2-0.3s
+- Scroll-triggered via `whileInView`, stagger 0.1s
 
-### Implementation
-- Set up development environment with proper tooling
-- Implement features following industry best practices
-- Write clean, maintainable, and well-documented code
-- Conduct thorough testing at all levels
+## 21st.dev Components (bookmarked for integration)
+All components are copied as source code and normalized to match our design system:
+- `Spline Scene` (serafim/splite) — hero 3D
+- `Gooey Text Morphing` (victorwelander) — text animation
+- `CardStack` (ruixenui) — stacked cards
+- `Feature Section` (ayushmxxn) — services grid
+- `Direction Aware Hover` (aceternity) — hover effects
+- `Sticky Scroll` (ui-layouts) — scroll reveal
+- `Shuffle Number` / `Number Flow` — animated counters
+- `Glassmorphism Portfolio` (reapollo) — portfolio section
+- `Feature Carousel` (0xUrvish) — case study carousel
+- `Bottom Menu` (0xUrvish) — floating nav
+- `Link Hover` (Shatlyk1011) — nav link effects
+- `Evervault Card` (aceternity) — encrypted card effect
+- `Floating Panel` (cult-ui) — contact panel
 
-### Optimization & Delivery
-- Performance profiling and optimization
-- Security audits and vulnerability scanning
-- SEO implementation and testing
-- Deployment and monitoring setup
+## Project Structure
+```
+src/
+├── app/           (pages: home, services/*, portfolio/*, about, contact)
+├── components/
+│   ├── ui/        (shadcn + 21st.dev primitives)
+│   ├── layout/    (navbar, footer, mobile-nav)
+│   ├── sections/  (hero, services, portfolio, stats, process, testimonials, cta)
+│   └── shared/    (section-heading, animated-counter, scroll-reveal)
+├── lib/           (utils, constants, fonts, metadata)
+├── hooks/         (use-scroll-progress, use-intersection, use-media-query)
+└── types/
+```
 
-## External Package Research
-I actively research and evaluate npm packages, APIs, and third-party services to find the best solutions for:
-- Authentication & authorization systems
-- Payment processing & subscription management
-- Email services & transactional messaging
-- File upload & media processing
-- Real-time features & notifications
-- Analytics & monitoring tools
-- Content management systems
-- Marketing automation tools
-
-## Client Communication
-- Translate technical concepts into business value
-- Provide clear progress updates and timelines
-- Offer strategic technical consulting
-- Document all implementations thoroughly
-
-## Continuous Learning
-I stay updated with the latest web development trends, emerging frameworks, and best practices through:
-- Official documentation and release notes
-- Industry standards and specifications
-- Security advisories and vulnerability databases
-- Performance optimization techniques
-- New browser APIs and capabilities
-
----
-
-*Ready to build professional, scalable, and secure web applications tailored to your clients' specific needs.*
+## Vercel Config
+- Project: `v0-jaspire-v4` (prj_nXgb81QLieb8lZyKRwzmEWTknAbw)
+- Team: `team_4p9AyHR44HPeCcjVTxRs5czr`
+- Domain: jaspire.co
