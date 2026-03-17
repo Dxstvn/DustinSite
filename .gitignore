@@ -39,6 +39,10 @@ yarn-error.log*
 # archive (local only)
 archive/
 
+# large media files (source locally, not in git)
+public/videos/*.mp4
+public/videos/*.webm
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
