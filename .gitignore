@@ -43,6 +43,15 @@ archive/
 public/videos/*.mp4
 public/videos/*.webm
 
+# root-level junk
+*.mp4
+*.png
+!public/**/*.png
+
+# capture-website-cli artifacts
+public/images/portfolio/engine.bin
+public/images/portfolio/*.html
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

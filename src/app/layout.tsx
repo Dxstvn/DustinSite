@@ -1,22 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Outfit, DM_Sans, JetBrains_Mono } from "next/font/google";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
+import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-
-const outfit = Outfit({
-  variable: "--font-outfit",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
-});
-
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "500", "600", "700"],
-});
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
@@ -55,7 +39,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0a",
+  themeColor: "#f5f3f0",
   width: "device-width",
   initialScale: 1,
 };
@@ -68,14 +52,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`dark ${outfit.variable} ${dmSans.variable} ${jetbrainsMono.variable}`}
+      className={jetbrainsMono.variable}
       suppressHydrationWarning
     >
-      <body className="min-h-dvh antialiased">
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
-      </body>
+      <body className="min-h-dvh antialiased">{children}</body>
     </html>
   );
 }

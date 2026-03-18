@@ -1,0 +1,123 @@
+/* =============================================================
+   Ann Pale Redesign -- Design Tokens & Keyframes
+   Scoped under .redesign so they never leak into the main app.
+   ============================================================= */
+
+.redesign {
+  /* ---- Surface colours ---- */
+  --rd-bg: hsl(270, 20%, 98%);
+  --rd-bg-card: hsl(270, 10%, 96%);
+  --rd-bg-dark: hsl(270, 30%, 8%);
+  --rd-bg-dark-card: hsl(270, 20%, 14%);
+
+  /* ---- Brand accents ---- */
+  --rd-gold: #D4A853;
+  --rd-blue: #0038A8;
+  --rd-red: #D21034;
+  --rd-purple: #9333EA;
+  --rd-pink: #EC4899;
+
+  /* ---- Text hierarchy ---- */
+  --rd-text: hsl(270, 5%, 15%);
+  --rd-text-muted: hsl(270, 5%, 45%);
+  --rd-text-light: hsl(270, 5%, 98%);
+
+  /* ---- Elevation (purple-tinted shadows) ---- */
+  --rd-shadow-sm: 0 1px 3px -1px rgba(147, 51, 234, 0.06),
+                  0 1px 2px -1px rgba(147, 51, 234, 0.04);
+  --rd-shadow-md: 0 4px 14px -2px rgba(147, 51, 234, 0.08),
+                  0 2px 4px -2px rgba(147, 51, 234, 0.04);
+  --rd-shadow-lg: 0 10px 25px -3px rgba(147, 51, 234, 0.10),
+                  0 4px 10px -4px rgba(147, 51, 234, 0.06);
+  --rd-shadow-xl: 0 20px 40px -5px rgba(147, 51, 234, 0.12),
+                  0 8px 16px -6px rgba(147, 51, 234, 0.08);
+}
+
+
+/* =============================================================
+   Keyframes
+   ============================================================= */
+
+/* Form shake on error */
+@keyframes formShake {
+  0%   { transform: translateX(0); }
+  15%  { transform: translateX(-6px); }
+  30%  { transform: translateX(5px); }
+  50%  { transform: translateX(-3px); }
+  70%  { transform: translateX(2px); }
+  85%  { transform: translateX(-1px); }
+  100% { transform: translateX(0); }
+}
+
+/* Continuous horizontal scroll for film-strip thumbnails */
+@keyframes filmStripScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Element reveal: slide up + fade in */
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Gold shimmer passing across text via background-position */
+@keyframes shimmerGold {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Haitian flag sweep: scaleX from left */
+@keyframes flagSweep {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* Continuous text ticker (same mechanic as filmStripScroll) */
+@keyframes tickerScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Rotating quote opacity cycle (0 -> 1 -> hold -> 0) */
+@keyframes quoteRotate {
+  0%   { opacity: 0; }
+  10%  { opacity: 1; }
+  30%  { opacity: 1; }
+  40%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* Tour loading dots pulse */
+@keyframes tourPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* Tour tooltip entrance */
+@keyframes tourTooltipIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Tour tail arrow pop-in */
+@keyframes tourTailIn {
+  from { opacity: 0; transform: scale(0.6); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+
+/* =============================================================
+   Reduced Motion
+   ============================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .redesign *,
+  .redesign *::before,
+  .redesign *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

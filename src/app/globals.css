@@ -1,3 +1,5 @@
+@import url("https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,700,800&f[]=satoshi@400,500,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -6,13 +8,14 @@
 
 /* ==========================================================================
    Jaspire Design System — Tailwind CSS 4
-   Dark-mode only. Premium digital agency aesthetic.
+   Light theme with dark zones. Premium digital agency aesthetic.
    ========================================================================== */
 
 @theme inline {
   /* --- Typography --- */
-  --font-sans: var(--font-dm-sans);
-  --font-display: var(--font-outfit);
+  --font-sans: "Satoshi", sans-serif;
+  --font-display: "Cabinet Grotesk", sans-serif;
+  --font-serif: "DM Serif Display", serif;
   --font-mono: var(--font-jetbrains-mono);
 
   /* --- shadcn/ui color tokens (mapped to CSS vars below) --- */
@@ -63,42 +66,42 @@
 }
 
 /* ==========================================================================
-   Dark Mode (only mode — applied via class="dark" on <html>)
+   Light Theme (default)
    ========================================================================== */
 
 :root {
   /* Background & surfaces */
-  --background: #0a0a0a;
-  --foreground: #fafafa;
+  --background: #f5f3f0;
+  --foreground: #1a1a1a;
 
-  /* Cards & popovers — surface-secondary */
-  --card: #111111;
-  --card-foreground: #fafafa;
-  --popover: #111111;
-  --popover-foreground: #fafafa;
+  /* Cards & popovers */
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
 
   /* Primary — brand purple */
   --primary: #7c6bf0;
   --primary-foreground: #fafafa;
 
-  /* Secondary — surface-tertiary */
-  --secondary: #1a1a1a;
-  --secondary-foreground: #fafafa;
+  /* Secondary */
+  --secondary: #f0ede8;
+  --secondary-foreground: #1a1a1a;
 
-  /* Muted — for subtle backgrounds & subdued text */
-  --muted: #1a1a1a;
-  --muted-foreground: #a3a3a3;
+  /* Muted */
+  --muted: #e8e5df;
+  --muted-foreground: #6b6b6b;
 
   /* Accent */
-  --accent: #1a1a1a;
-  --accent-foreground: #fafafa;
+  --accent: #f0ede8;
+  --accent-foreground: #1a1a1a;
 
   /* Destructive */
   --destructive: #ef4444;
 
   /* Borders & inputs */
-  --border: #262626;
-  --input: #262626;
+  --border: #d4d0c8;
+  --input: #d4d0c8;
   --ring: #7c6bf0;
 
   /* Charts */
@@ -112,13 +115,13 @@
   --radius: 0.75rem;
 
   /* Sidebar */
-  --sidebar: #0a0a0a;
-  --sidebar-foreground: #fafafa;
+  --sidebar: #f5f3f0;
+  --sidebar-foreground: #1a1a1a;
   --sidebar-primary: #7c6bf0;
   --sidebar-primary-foreground: #fafafa;
-  --sidebar-accent: #1a1a1a;
-  --sidebar-accent-foreground: #fafafa;
-  --sidebar-border: #262626;
+  --sidebar-accent: #f0ede8;
+  --sidebar-accent-foreground: #1a1a1a;
+  --sidebar-border: #d4d0c8;
   --sidebar-ring: #7c6bf0;
 
   /* --- Jaspire custom tokens --- */
@@ -133,15 +136,15 @@
   --accent-orange: #f97316;
 
   /* Text hierarchy */
-  --text-primary: #fafafa;
-  --text-secondary: #a3a3a3;
-  --text-tertiary: #737373;
+  --text-primary: #1a1a1a;
+  --text-secondary: #525252;
+  --text-tertiary: #8a8a8a;
 
   /* Surface hierarchy */
-  --surface-primary: #0a0a0a;
-  --surface-secondary: #111111;
-  --surface-tertiary: #1a1a1a;
-  --surface-border: #262626;
+  --surface-primary: #f5f3f0;
+  --surface-secondary: #ffffff;
+  --surface-tertiary: #f0ede8;
+  --surface-border: #d4d0c8;
 
   /* Motion tokens */
   --duration-fast: 200ms;
@@ -150,6 +153,42 @@
   --duration-slower: 800ms;
   --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
   --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+/* ==========================================================================
+   Dark Zone Override — applied via data-theme="dark" on section wrappers
+   ========================================================================== */
+
+[data-theme="dark"] {
+  color: #fafafa;
+  background-color: #0a0a0a;
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --card: #111111;
+  --card-foreground: #fafafa;
+  --popover: #111111;
+  --popover-foreground: #fafafa;
+  --primary-foreground: #fafafa;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #fafafa;
+  --muted: #1a1a1a;
+  --muted-foreground: #a3a3a3;
+  --accent: #1a1a1a;
+  --accent-foreground: #fafafa;
+  --border: #262626;
+  --input: #262626;
+  --sidebar: #0a0a0a;
+  --sidebar-foreground: #fafafa;
+  --sidebar-accent: #1a1a1a;
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: #262626;
+  --text-primary: #fafafa;
+  --text-secondary: #a3a3a3;
+  --text-tertiary: #737373;
+  --surface-primary: #0a0a0a;
+  --surface-secondary: #111111;
+  --surface-tertiary: #1a1a1a;
+  --surface-border: #262626;
 }
 
 /* ==========================================================================
@@ -200,6 +239,10 @@
   /* Selection color */
   ::selection {
     background-color: #7c6bf040;
+    color: #1a1a1a;
+  }
+
+  [data-theme="dark"] ::selection {
     color: #fafafa;
   }
 }
@@ -212,6 +255,14 @@
   /* Brand gradient text */
   .text-gradient {
     background: linear-gradient(135deg, var(--brand-glow-start), var(--brand-glow-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Brighter gradient text for dark zones (better contrast on dark bg) */
+  [data-theme="dark"] .text-gradient {
+    background: linear-gradient(135deg, #a78bfa, #60a5fa);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -231,9 +282,13 @@
 
   /* Glass morphism surface */
   .glass {
-    background: rgba(17, 17, 17, 0.6);
+    background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
+  }
+
+  [data-theme="dark"] .glass {
+    background: rgba(17, 17, 17, 0.6);
   }
 
   /* Noise texture overlay */

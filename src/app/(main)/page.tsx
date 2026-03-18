@@ -5,7 +5,7 @@ import { PortfolioShowcase } from "@/components/sections/portfolio-showcase";
 import { StatsBar } from "@/components/sections/stats-bar";
 import { ProcessSection } from "@/components/sections/process-section";
 import { Testimonials } from "@/components/sections/testimonials";
-import { CTASection } from "@/components/sections/cta-section";
+import { GlobalReach } from "@/components/sections/global-reach";
 
 export default function Home() {
   return (
@@ -17,7 +17,7 @@ export default function Home() {
       <StatsBar />
       <ProcessSection />
       <Testimonials />
-      <CTASection />
+      <GlobalReach />
     </>
   );
 }

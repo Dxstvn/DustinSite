@@ -20,7 +20,7 @@ Jaspire (jaspire.co) is a premium media agency offering web development, SEO, an
 ## Design Direction
 
 ### Aesthetic
-Dark-mode-first, motion-heavy, premium agency feel. No light mode toggle — dark only.
+Light theme with dark zones (hero, CTA, footer). Warm cream (#f5f3f0) base. Motion-heavy, premium agency feel. Dark zones use `data-theme="dark" className="dark"` for CSS var scoping.
 
 ### Primary Inspiration: Analogue Agency (analogueagency.com)
 - Full-viewport WebGL/animated hero with scroll-driven text animations
@@ -52,11 +52,13 @@ Dark-mode-first, motion-heavy, premium agency feel. No light mode toggle — dar
 
 ## Design System
 
-### Colors
-- Background: `#0a0a0a`, Surface: `#111111`, `#1a1a1a`
+### Colors (Light Theme)
+- Background: `#f5f3f0` (warm cream), Surface: `#ffffff`, `#f0ede8`
 - Brand: `#7c6bf0` (electric purple)
-- Text: `#fafafa` primary, `#a3a3a3` secondary
+- Text: `#1a1a1a` primary, `#525252` secondary, `#8a8a8a` tertiary
+- Borders: `#d4d0c8`
 - Accents: Blue (Web Dev), Green (SEO), Orange (Social Media)
+- Dark zones override all vars via `[data-theme="dark"]` in CSS
 
 ### Typography
 - Display: Cabinet Grotesk | Body: Satoshi | Mono: JetBrains Mono
