@@ -82,6 +82,7 @@ type NavState = "hero" | "light" | "portfolio" | "dark" | "footer";
 function getNavState(sectionId: string): NavState {
   switch (sectionId) {
     case "hero":
+    case "about-hero":
       return "hero";
     case "portfolio":
       return "portfolio";
