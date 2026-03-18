@@ -325,7 +325,7 @@ function MobileAboutHero() {
               style={{ objectPosition: "top" }}
             >
               <source
-                src="/images/about/founder-reveal.mp4"
+                src="https://yijizsscwkvepljqojkz.supabase.co/storage/v1/object/public/jaspire-media/videos/Glass_Reveal_Video_Generation.mp4"
                 type="video/mp4"
               />
             </video>
