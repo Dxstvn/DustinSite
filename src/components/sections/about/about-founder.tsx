@@ -58,7 +58,7 @@ export function AboutFounder() {
               <ScrollReveal>
                 <div className="relative aspect-[3/4] overflow-hidden rounded-2xl">
                   <Image
-                    src="/images/about/founder-portrait.webp"
+                    src="/images/about/founder-portrait.png"
                     alt="Dustin Jasmin — Founder of Jaspire"
                     fill
                     sizes="(min-width: 768px) 45vw, 100vw"
@@ -108,7 +108,7 @@ export function AboutFounder() {
           <ScrollReveal>
             <div className="relative mb-8 aspect-[4/3] overflow-hidden rounded-2xl">
               <Image
-                src="/images/about/founder-portrait.webp"
+                src="/images/about/founder-portrait.png"
                 alt="Dustin Jasmin — Founder of Jaspire"
                 fill
                 sizes="100vw"

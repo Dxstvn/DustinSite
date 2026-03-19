@@ -291,6 +291,13 @@
     background: rgba(17, 17, 17, 0.6);
   }
 
+  /* Shimmer button animation */
+  @keyframes shimmer-slide {
+    to {
+      transform: translate(calc(100cqw - 100%), 0);
+    }
+  }
+
   /* Noise texture overlay */
   .noise {
     position: relative;

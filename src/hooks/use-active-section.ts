@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { portfolioProjects, type PortfolioProject } from "@/lib/constants";
 
 export interface ActiveSectionState {
@@ -20,6 +21,8 @@ export interface ActiveSectionState {
  * disconnected and reconnected so IO fires fresh initial callbacks for all elements.
  */
 export function useActiveSection(): ActiveSectionState {
+  const pathname = usePathname();
+
   const [state, setState] = useState<ActiveSectionState>({
     activeSectionId: "hero",
     activeSectionTheme: "dark",
@@ -151,6 +154,8 @@ export function useActiveSection(): ActiveSectionState {
   useEffect(() => {
     // Clear the ratio map on reconnect so stale entries don't persist
     sectionRatioMap.current.clear();
+    // Reset to safe default on page change
+    setState({ activeSectionId: "hero", activeSectionTheme: "dark" });
 
     const sections = document.querySelectorAll("[data-section-id]");
     if (sections.length === 0) return;
@@ -163,7 +168,7 @@ export function useActiveSection(): ActiveSectionState {
     sections.forEach((section) => observer.observe(section));
 
     return () => observer.disconnect();
-  }, [handleSectionIntersection, modalClosed]); // modalClosed triggers reconnect
+  }, [handleSectionIntersection, modalClosed, pathname]); // pathname triggers reconnect on navigation
 
   // ─── Project card observer ───────────────────────────────────────────
   useEffect(() => {
@@ -243,7 +248,7 @@ export function useActiveSection(): ActiveSectionState {
     cards.forEach((card) => projectObserver.observe(card));
 
     return () => projectObserver.disconnect();
-  }, [modalClosed]); // modalClosed triggers reconnect
+  }, [modalClosed, pathname]); // modalClosed + pathname trigger reconnect
 
   return state;
 }

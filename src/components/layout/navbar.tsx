@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { motion as m, AnimatePresence, useMotionValue, useSpring, type TargetAndTransition } from "motion/react";
 import { Menu, X, ArrowUpRight, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -87,6 +88,7 @@ function getNavState(sectionId: string): NavState {
     case "portfolio":
       return "portfolio";
     case "stats":
+    case "contact-hero":
       return "dark";
     case "footer-cta":
     case "footer":
@@ -392,9 +394,10 @@ export function Navbar() {
   const [email, setEmail] = useState("");
   const isModalOpen = useBodyModalOpen();
 
+  const pathname = usePathname();
   const navState = getNavState(activeSectionId);
   const textColors = getTextColors(navState);
-  const isFooter = navState === "footer";
+  const isFooter = navState === "footer" && pathname !== "/contact";
   const isPortfolioWithProject =
     navState === "portfolio" && !!activeProject;
 
