@@ -16,7 +16,7 @@ const steps = [
     icon: Compass,
     accent: "#3b82f6",
     accentBg: "rgba(59, 130, 246, 0.1)",
-    imageSrc: "/images/process/discovery.jpg",
+    imageSrc: "/images/process/discovery.png",
   },
   {
     number: "02",
@@ -26,7 +26,7 @@ const steps = [
     icon: Target,
     accent: "#7c6bf0",
     accentBg: "rgba(124, 107, 240, 0.1)",
-    imageSrc: "/images/process/strategy.jpg",
+    imageSrc: "/images/process/strategy.png",
   },
   {
     number: "03",
@@ -36,7 +36,7 @@ const steps = [
     icon: Rocket,
     accent: "#22c55e",
     accentBg: "rgba(34, 197, 94, 0.1)",
-    imageSrc: "/images/process/execution.jpg",
+    imageSrc: "/images/process/execution.png",
   },
   {
     number: "04",
@@ -46,7 +46,7 @@ const steps = [
     icon: TrendingUp,
     accent: "#f97316",
     accentBg: "rgba(249, 115, 22, 0.1)",
-    imageSrc: "/images/process/growth.jpg",
+    imageSrc: "/images/process/growth.png",
   },
 ];
 
