@@ -45,6 +45,7 @@ public/videos/*.webm
 
 # root-level junk
 *.mp4
+!public/hero-video.mp4
 *.png
 !public/**/*.png
 

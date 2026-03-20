@@ -104,7 +104,7 @@ export function Hero() {
           className="absolute inset-0 h-full w-full object-cover"
           style={{ objectPosition: "center 45%" }}
         >
-          <source src="https://yijizsscwkvepljqojkz.supabase.co/storage/v1/object/public/jaspire-hero-bucket/hero-new.mp4" type="video/mp4" />
+          <source src="/hero-video.mp4" type="video/mp4" />
         </video>
 
         {/* Dark overlay — lighter to let the vibrant blue rays show through */}
