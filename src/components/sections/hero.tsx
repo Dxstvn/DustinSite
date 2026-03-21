@@ -102,7 +102,7 @@ export function Hero() {
           playsInline
           preload="auto"
           className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: "center 45%" }}
+          style={{ objectPosition: "center 42%" }}
         >
           <source src="/hero-video.mp4" type="video/mp4" />
         </video>
