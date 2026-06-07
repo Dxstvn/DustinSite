@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion as m, useScroll, useTransform } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
 import { portfolioProjects } from "@/lib/constants";
@@ -142,6 +143,17 @@ export function PortfolioShowcase() {
             onCardClick={handleCardClick}
           />
         ))}
+      </div>
+
+      {/* View All Work link */}
+      <div className="mt-16 px-4 text-center sm:px-6 md:mt-24 lg:px-8">
+        <Link
+          href="/portfolio"
+          className="group inline-flex items-center gap-2 font-mono text-sm uppercase tracking-[0.15em] text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
+        >
+          View All Work
+          <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+        </Link>
       </div>
 
       <PortfolioDemoModal

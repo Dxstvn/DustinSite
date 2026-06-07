@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <rect width="32" height="32" rx="6" fill="#0F4D47"/>
+  <!-- Calm mind: head arc + steady breath wave -->
+  <path d="M11 21 a5 5 0 1 1 8 -3" fill="none" stroke="#5EEAD4" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M8 22 q2.5 -3 5 0 t5 0 t5 0" fill="none" stroke="#5EEAD4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+</svg>

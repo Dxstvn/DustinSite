@@ -1,12 +1,14 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef } from "react";
 import Image from "next/image";
 import {
   motion as m,
   useScroll,
   useTransform,
-  useMotionValueEvent,
+  useSpring,
+  useMotionTemplate,
+  useReducedMotion,
   type MotionValue,
 } from "motion/react";
 import { containerWidth } from "@/lib/constants";
@@ -17,22 +19,12 @@ import { ScrollReveal } from "@/components/shared/scroll-reveal";
 // Constants
 // ---------------------------------------------------------------------------
 
-const TOTAL_FRAMES = 192;
-const FRAME_PATH = "/images/about/frames/frame_";
-const FRAME_EXT = ".webp";
-const CANVAS_WIDTH = 1280;
-// Crop bottom 5% to remove Veo watermark
-const ORIGINAL_HEIGHT = 2276;
-const CROP_RATIO = 0.95;
-const CANVAS_HEIGHT = Math.floor(ORIGINAL_HEIGHT * CROP_RATIO); // 2162
-
 const missionText =
   "We believe every brand deserves a digital presence as ambitious as its vision. Great work isn't about trends — it's about craft, clarity, and conviction.";
 
-function getFrameSrc(index: number): string {
-  const padded = String(index + 1).padStart(4, "0");
-  return `${FRAME_PATH}${padded}${FRAME_EXT}`;
-}
+// The closing clause "craft, clarity, and conviction." carries the brand
+// gradient. These are the final word indices in missionText (25 words total).
+const GRADIENT_FROM_INDEX = 21;
 
 // ---------------------------------------------------------------------------
 // Word component for word-by-word reveal
@@ -42,18 +34,38 @@ function Word({
   word,
   index,
   wordProgress,
+  gradient,
+  reduce,
 }: {
   word: string;
   index: number;
   wordProgress: MotionValue<number>;
+  gradient?: boolean;
+  reduce: boolean;
 }) {
-  // Each word transitions from 0.15→1 opacity over a 1.5-word-wide band
+  // Each word transitions from 0.15→1 opacity over a 1.5-word-wide band.
   const opacity = useTransform(wordProgress, [index - 0.5, index + 1], [0.15, 1]);
+  // Per-word blur + lift, composed into a CSS filter string. A bare numeric
+  // MotionValue on style.filter is invalid — useMotionTemplate gives us a
+  // proper `blur(Npx)` string that animates.
+  const blur = useTransform(wordProgress, [index - 0.5, index + 1], [6, 0]);
+  const filter = useMotionTemplate`blur(${blur}px)`;
+  const y = useTransform(wordProgress, [index - 0.5, index + 1], [8, 0]);
+
+  // Under reduced motion, freeze the vestibular bits (blur + lift) but keep
+  // the opacity reveal — it's non-vestibular and core to the storytelling.
+  const style = reduce
+    ? { opacity }
+    : { opacity, y, filter };
 
   return (
     <m.span
-      style={{ opacity }}
-      className="mr-[0.3em] inline-block text-white"
+      style={style}
+      className={
+        gradient
+          ? "text-gradient mr-[0.3em] inline-block"
+          : "mr-[0.3em] inline-block text-white"
+      }
     >
       {word}
     </m.span>
@@ -61,35 +73,27 @@ function Word({
 }
 
 // ---------------------------------------------------------------------------
-// Desktop Hero — split-screen: mission text left + canvas video right
+// Desktop Hero — single centered text plane over abstract video backdrop
 // ---------------------------------------------------------------------------
 
 function DesktopAboutHero() {
   const sectionRef = useRef<HTMLElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const framesRef = useRef<HTMLImageElement[]>([]);
-  const [framesLoaded, setFramesLoaded] = useState(false);
+  const reduce = useReducedMotion() ?? false;
+  // Only fetch the desktop backdrop on a real desktop viewport — this subtree
+  // also exists (display:none) on mobile, so without this gate the hidden
+  // <video> would still download.
+  // useMediaQuery returns false on the server + first client paint and only
+  // flips true after mount, so this doubles as the hydration guard: SSR + first
+  // paint render the poster, and the <video> only mounts post-hydration on a
+  // real desktop viewport (and never under reduced motion).
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"],
   });
 
-  // --- Video frame index: non-linear mapping to sync with text pace ---
-  // The glass clears front-loaded (most action in frames 30-120), so we slow
-  // those down to match the linear word reveal. Piecewise linear interpolation:
-  // 0.05-0.20: frames 0-30   (still frosted, ~6 words revealed)
-  // 0.20-0.40: frames 30-90  (glass clearing, ~12 words revealed)
-  // 0.40-0.55: frames 90-150 (face fully clear, ~18 words revealed)
-  // 0.55-0.63: frames 150-191 (static smile hold, final words)
-  const frameIndex = useTransform(
-    scrollYProgress,
-    [0.05, 0.20, 0.40, 0.55, 0.63],
-    [0, 30, 90, 150, TOTAL_FRAMES - 1]
-  );
-
   // --- Word progress: single transform mapping scroll to word index 0→totalWords ---
-  // Uses the SAME scroll range as video so they finish together
   const words = missionText.split(" ");
   const totalWords = words.length;
   const wordProgress = useTransform(
@@ -105,88 +109,84 @@ function DesktopAboutHero() {
   const founderOpacity = useTransform(scrollYProgress, [0.58, 0.68], [0, 1]);
   const founderY = useTransform(scrollYProgress, [0.58, 0.68], [20, 0]);
 
-  // --- Preload frames ---
-  useEffect(() => {
-    const images: HTMLImageElement[] = [];
-    let loaded = 0;
+  // --- Attribution hairline draws in alongside the founder lockup ---
+  const hairlineScaleX = useTransform(scrollYProgress, [0.58, 0.68], [0, 1]);
 
-    for (let i = 0; i < TOTAL_FRAMES; i++) {
-      const img = new window.Image();
-      img.src = getFrameSrc(i);
-      img.onload = () => {
-        loaded++;
-        if (loaded === TOTAL_FRAMES) setFramesLoaded(true);
-      };
-      img.onerror = () => {
-        loaded++;
-        if (loaded === TOTAL_FRAMES) setFramesLoaded(true);
-      };
-      images[i] = img;
-    }
+  // --- Video backdrop: slow Ken-Burns drift, spring-smoothed ---
+  const videoScaleRaw = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
+  const videoYRaw = useTransform(scrollYProgress, [0, 1], ["0vh", "8vh"]);
+  const videoScale = useSpring(videoScaleRaw, { stiffness: 80, damping: 30 });
+  const videoY = useSpring(videoYRaw, { stiffness: 80, damping: 30 });
 
-    framesRef.current = images;
-  }, []);
+  // --- Analogue "shrink into card": the dark viewport contracts on exit,
+  // revealing the cream <section> behind it. heroRadius rounds the corners as
+  // it shrinks — integrator may drop heroRadius if it janks on lower-end GPUs.
+  const heroScale = useTransform(scrollYProgress, [0.85, 1], [1, 0.96]);
+  const heroRadius = useTransform(scrollYProgress, [0.85, 1], [0, 28]);
 
-  // --- Draw frame to canvas with watermark crop ---
-  const drawFrame = useCallback((index: number) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const frameIdx = Math.round(
-      Math.max(0, Math.min(TOTAL_FRAMES - 1, index))
-    );
-    const img = framesRef.current[frameIdx];
-
-    if (img && img.complete && img.naturalWidth > 0) {
-      const cropHeight = Math.floor(img.naturalHeight * CROP_RATIO);
-      ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-      // Draw only the top 95% of the source image, cropping out the watermark
-      ctx.drawImage(
-        img,
-        0, 0, img.naturalWidth, cropHeight, // source: full width, cropped height
-        0, 0, CANVAS_WIDTH, CANVAS_HEIGHT    // destination: full canvas
-      );
-    }
-  }, []);
-
-  // Draw initial frame once loaded
-  useEffect(() => {
-    if (framesLoaded) drawFrame(0);
-  }, [framesLoaded, drawFrame]);
-
-  // Bind scroll to canvas drawing
-  useMotionValueEvent(frameIndex, "change", (latest) => {
-    drawFrame(latest);
-  });
+  // Under reduced motion, every motion-driven layer is static.
+  const viewportStyle = reduce
+    ? undefined
+    : { scale: heroScale, borderRadius: heroRadius };
+  const videoLayerStyle = reduce ? undefined : { scale: videoScale, y: videoY };
 
   return (
+    // Keep the cream section bg so the shrinking dark card reveals it behind.
     <section
       ref={sectionRef}
       data-section-id="about-hero"
       className="relative bg-[#f5f3f0]"
-      style={{ height: "350vh" }}
+      style={{ height: "350vh" }} // pacing can shorten toward ~280vh after manual verification — leave as-is for now
     >
-      {/* Sticky viewport */}
-      <div
+      {/* Sticky dark viewport */}
+      <m.div
         data-theme="dark"
-        className="dark sticky top-0 flex h-dvh items-center overflow-hidden bg-[#0a0a0a]"
+        className="dark sticky top-0 flex h-dvh items-center justify-center overflow-hidden bg-[#0a0a0a]"
+        style={viewportStyle}
       >
-        {/* Noise texture */}
+        {/* (1) Video backdrop — full-bleed object-cover. Poster on SSR/first
+            paint; real <video> only when !reduce && on a desktop viewport. */}
+        {!reduce && isDesktop ? (
+          <m.video
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ ...videoLayerStyle, opacity: 0.28 }}
+            poster="/images/about/hero-poster.webp"
+            muted
+            autoPlay
+            loop
+            playsInline
+            preload="auto"
+            aria-hidden
+          >
+            <source src="/videos/about-hero.webm" type="video/webm" />
+            <source src="/videos/about-hero.mp4" type="video/mp4" />
+          </m.video>
+        ) : (
+          <div className="absolute inset-0 opacity-[0.28]">
+            <Image
+              src="/images/about/hero-poster.webp"
+              alt=""
+              fill
+              priority
+              aria-hidden
+              className="object-cover"
+            />
+          </div>
+        )}
+
+        {/* (2) Noise texture */}
         <div className="noise absolute inset-0" />
 
-        {/* Subtle brand glow */}
+        {/* (2) Brand-purple radial glow */}
         <div
-          className="absolute inset-0 opacity-20"
+          className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse at 30% 50%, rgba(124, 107, 240, 0.08) 0%, transparent 60%)",
+              "radial-gradient(ellipse at 50% 45%, rgba(124,107,240,0.10) 0%, transparent 60%)",
           }}
         />
 
-        {/* Grid pattern */}
+        {/* (2) 64px white grid */}
         <div
           className="absolute inset-0 opacity-[0.02]"
           style={{
@@ -196,35 +196,62 @@ function DesktopAboutHero() {
           }}
         />
 
-        {/* Split-screen content */}
+        {/* (3) Vertical legibility scrim — heavier top & bottom */}
         <div
-          className={`${containerWidth} relative flex items-center gap-12 lg:gap-16 xl:gap-20`}
-        >
-          {/* Left: Mission text with word-by-word reveal */}
-          <div className="w-[55%] space-y-8">
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.25) 40%, rgba(10,10,10,0.65) 100%)",
+          }}
+        />
+
+        {/* (4) Always-on darkening plate behind the text column. White-text
+            legibility must NOT depend on which video frame is showing, so this
+            sits regardless of the backdrop's brightness. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-1/2 h-[80%] w-[min(60rem,90vw)] -translate-x-1/2 -translate-y-1/2"
+          style={{
+            background:
+              "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(10,10,10,0.5) 0%, rgba(10,10,10,0.35) 55%, transparent 100%)",
+          }}
+        />
+
+        {/* Centered text plane */}
+        <div className={`${containerWidth} relative`}>
+          <div className="mx-auto max-w-4xl space-y-8 px-8 text-center">
             {/* Mono kicker */}
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-white/40">
               Our Mission
             </p>
 
             {/* Word-by-word reveal heading */}
-            <p className="max-w-xl font-display text-4xl font-bold leading-[1.15] tracking-tight lg:text-5xl xl:text-6xl">
+            <p className="font-display text-4xl font-bold leading-[1.05] tracking-tight text-white md:text-6xl lg:text-7xl">
               {words.map((word, i) => (
                 <Word
                   key={`${word}-${i}`}
                   word={word}
                   index={i}
                   wordProgress={wordProgress}
+                  gradient={i >= GRADIENT_FROM_INDEX}
+                  reduce={reduce}
                 />
               ))}
             </p>
 
-            {/* Founder attribution — fades in at end */}
+            {/* Founder attribution — fades in at end, with drawn hairline */}
             <m.div
-              className="flex items-center gap-4 pt-4"
-              style={{ opacity: founderOpacity, y: founderY }}
+              className="flex items-center justify-center gap-4 pt-4"
+              style={
+                reduce
+                  ? { opacity: founderOpacity }
+                  : { opacity: founderOpacity, y: founderY }
+              }
             >
-              <div className="h-px w-10 bg-white/20" />
+              <m.div
+                className="h-px w-10 origin-left bg-white/30"
+                style={reduce ? undefined : { scaleX: hairlineScaleX }}
+              />
               <span className="font-mono text-xs uppercase tracking-[0.15em] text-white/50">
                 Dustin Jasmin
               </span>
@@ -233,31 +260,6 @@ function DesktopAboutHero() {
                 Founder & Creative Director
               </span>
             </m.div>
-          </div>
-
-          {/* Right: Canvas video */}
-          <div className="w-[45%]">
-            <div className="relative mx-auto h-[70vh] w-auto overflow-hidden rounded-2xl shadow-2xl shadow-black/40">
-              <canvas
-                ref={canvasRef}
-                width={CANVAS_WIDTH}
-                height={CANVAS_HEIGHT}
-                className="block h-full w-auto"
-              />
-
-              {/* Loading placeholder */}
-              {!framesLoaded && (
-                <div className="absolute inset-0">
-                  <Image
-                    src={getFrameSrc(0)}
-                    alt=""
-                    fill
-                    className="object-cover object-top blur-sm"
-                    priority
-                  />
-                </div>
-              )}
-            </div>
           </div>
         </div>
 
@@ -271,7 +273,7 @@ function DesktopAboutHero() {
           </span>
           <m.div
             className="h-8 w-px bg-gradient-to-b from-white/30 to-transparent"
-            animate={{ scaleY: [0.5, 1, 0.5] }}
+            animate={reduce ? undefined : { scaleY: [0.5, 1, 0.5] }}
             transition={{
               duration: 2,
               repeat: Infinity,
@@ -279,16 +281,21 @@ function DesktopAboutHero() {
             }}
           />
         </m.div>
-      </div>
+      </m.div>
     </section>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Mobile Hero — stacked: mission text + video autoplay
+// Mobile Hero — stacked: mission text + abstract video backdrop
 // ---------------------------------------------------------------------------
 
 function MobileAboutHero() {
+  const reduce = useReducedMotion() ?? false;
+  // This subtree also exists (display:none) on desktop; only fetch the backdrop
+  // video on an actual mobile viewport. False on SSR/first paint → poster first.
+  const isMobile = useMediaQuery("(max-width: 767px)");
+
   return (
     <section
       data-section-id="about-hero"
@@ -308,27 +315,50 @@ function MobileAboutHero() {
 
         <ScrollReveal delay={0.1}>
           <p className="mb-10 max-w-md font-display text-3xl font-bold leading-[1.15] tracking-tight text-white sm:text-4xl">
-            {missionText}
+            We believe every brand deserves a digital presence as ambitious as
+            its vision. Great work isn&apos;t about trends — it&apos;s about{" "}
+            <span className="text-gradient">
+              craft, clarity, and conviction.
+            </span>
           </p>
         </ScrollReveal>
 
-        {/* Video autoplay */}
+        {/* Abstract video backdrop (poster only under reduced motion) */}
         <ScrollReveal delay={0.15}>
-          <div className="mb-8 overflow-hidden rounded-2xl">
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="auto"
-              className="block h-auto w-full"
-              style={{ objectPosition: "top" }}
-            >
-              <source
-                src="https://yijizsscwkvepljqojkz.supabase.co/storage/v1/object/public/jaspire-media/videos/Glass_Reveal_Video_Generation.mp4"
-                type="video/mp4"
+          <div className="relative mb-8 overflow-hidden rounded-2xl">
+            {reduce || !isMobile ? (
+              <Image
+                src="/images/about/hero-poster.webp"
+                alt=""
+                width={1280}
+                height={720}
+                aria-hidden
+                className="block h-auto w-full opacity-[0.22]"
               />
-            </video>
+            ) : (
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                poster="/images/about/hero-poster.webp"
+                aria-hidden
+                className="block h-auto w-full opacity-[0.22]"
+              >
+                <source src="/videos/about-hero.webm" type="video/webm" />
+                <source src="/videos/about-hero.mp4" type="video/mp4" />
+              </video>
+            )}
+            {/* Legibility scrim over the backdrop */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(180deg, rgba(10,10,10,0.45) 0%, rgba(10,10,10,0.2) 45%, rgba(10,10,10,0.55) 100%)",
+              }}
+            />
           </div>
         </ScrollReveal>
 
@@ -358,11 +388,19 @@ function MobileAboutHero() {
 // ---------------------------------------------------------------------------
 
 export function AboutHero() {
-  const isDesktop = useMediaQuery("(min-width: 768px)");
-
-  if (typeof window === "undefined") {
-    return <MobileAboutHero />;
-  }
-
-  return isDesktop ? <DesktopAboutHero /> : <MobileAboutHero />;
+  // CSS-driven responsive split (matches AboutFounder): both subtrees render on
+  // the server and the wrong one is hidden via CSS from the first paint, so
+  // there's no media-query flash or layout/height jump on hydration. Each
+  // subtree only fetches its <video> on its own breakpoint (see isDesktop /
+  // isMobile gates), so the hidden one never downloads the backdrop.
+  return (
+    <>
+      <div className="hidden md:block">
+        <DesktopAboutHero />
+      </div>
+      <div className="md:hidden">
+        <MobileAboutHero />
+      </div>
+    </>
+  );
 }

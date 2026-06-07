@@ -6,7 +6,7 @@ import { ArrowUpRight } from "lucide-react";
 import { siteConfig } from "@/lib/constants";
 
 const navLinks = [
-  { label: "Portfolio", href: "/portfolio" },
+  { label: "Work", href: "/portfolio" },
   { label: "Services", href: "/services" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },

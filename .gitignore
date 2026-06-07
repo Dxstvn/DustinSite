@@ -56,3 +56,13 @@ public/images/portfolio/*.html
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# About-page abstract hero backdrop — small (≈1.5–2MB), required for deploy.
+# Overrides the public/videos/*.mp4|webm and *.mp4 ignores above (last match wins).
+!public/videos/about-hero.mp4
+!public/videos/about-hero.webm
+
+# Personal / source photos dropped at the repo root — local only, never deploy.
+/IMG_*.jpeg
+/IMG_*.jpg
+/Photo*.jpg

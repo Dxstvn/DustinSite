@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <rect width="32" height="32" rx="6" fill="#3A2E0A"/>
+  <!-- Lottery ticket with notches + lucky star -->
+  <path d="M8 12 a2 2 0 0 0 0 4 V21 H24 V16 a2 2 0 0 1 0 -4 V11 H8 Z" fill="none" stroke="#D4AF37" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M16 13.2 l1.1 2.3 2.5 0.3 -1.8 1.7 0.5 2.5 -2.3 -1.2 -2.3 1.2 0.5 -2.5 -1.8 -1.7 2.5 -0.3 Z" fill="#D4AF37"/>
+</svg>

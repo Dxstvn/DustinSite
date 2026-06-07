@@ -298,6 +298,16 @@
     }
   }
 
+  /* Hide scrollbar (used on horizontal-scroll filter bars, carousels) */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
   /* Noise texture overlay */
   .noise {
     position: relative;

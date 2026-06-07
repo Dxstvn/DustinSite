@@ -84,11 +84,19 @@ function getNavState(sectionId: string): NavState {
   switch (sectionId) {
     case "hero":
     case "about-hero":
+    case "work-hero":
+    case "services-hero":
       return "hero";
     case "portfolio":
       return "portfolio";
     case "stats":
     case "contact-hero":
+    case "work-cta":
+    case "case-study-hero":
+    case "case-study-results":
+    case "portfolio-feature":
+    case "portfolio-index":
+    case "cta":
       return "dark";
     case "footer-cta":
     case "footer":

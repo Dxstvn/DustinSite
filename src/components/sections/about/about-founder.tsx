@@ -1,8 +1,21 @@
 "use client";
 
-import Image from "next/image";
-import { sectionPadding, containerWidth } from "@/lib/constants";
+import { useRef } from "react";
+import {
+  motion as m,
+  useScroll,
+  useTransform,
+  useReducedMotion,
+} from "motion/react";
+import {
+  sectionPadding,
+  containerWidth,
+  motion as motionPresets,
+  siteConfig,
+} from "@/lib/constants";
 import { ScrollReveal } from "@/components/shared/scroll-reveal";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { cn } from "@/lib/utils";
 
 interface BioBlock {
   kicker: string;
@@ -37,116 +50,274 @@ const bioBlocks: BioBlock[] = [
   },
 ];
 
-export function AboutFounder() {
+const monoKicker =
+  "font-mono text-xs font-medium uppercase tracking-[0.2em] text-[var(--text-tertiary)]";
+
+/**
+ * Brand card — the non-face anchor that replaces the deleted portrait. The
+ * gradient panel now carries real brand content (wordmark, ethos, tagline) so
+ * it reads as an intentional brand mark rather than an empty decorative box.
+ */
+function BrandPlate({ className }: { className?: string }) {
   return (
-    <section data-section-id="about-founder" className={sectionPadding}>
-      <div className={containerWidth}>
-        <ScrollReveal>
-          <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
-            The Founder
+    <div
+      className={cn(
+        "noise glow-brand bg-gradient-brand relative overflow-hidden rounded-2xl text-white",
+        className,
+      )}
+    >
+      {/* Soft inner light to give the flat gradient depth */}
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-[radial-gradient(120%_80%_at_30%_15%,rgba(255,255,255,0.22),transparent_60%)]"
+      />
+      {/* Bottom scrim anchors the small type for legibility */}
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent"
+      />
+
+      {/* Brand content */}
+      <div className="relative flex h-full flex-col justify-between gap-5 p-6 md:p-8">
+        {/* Wordmark */}
+        <div className="flex items-center gap-2.5">
+          <span aria-hidden className="size-2.5 rounded-full bg-white/90" />
+          <span className="font-display text-2xl font-bold lowercase tracking-tight md:text-3xl">
+            {siteConfig.name}
+          </span>
+        </div>
+
+        {/* Ethos line — drawn from the Philosophy block */}
+        <p className="font-display text-xl font-medium leading-snug tracking-tight md:text-2xl">
+          Craft meets strategy.
+        </p>
+
+        {/* Tagline + domain */}
+        <div className="space-y-1.5">
+          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/75">
+            {siteConfig.tagline}
           </p>
-          <h2 className="mb-16 max-w-lg text-3xl font-bold tracking-tight md:mb-20 md:text-4xl">
+          <p className="font-mono text-[11px] tracking-wide text-white/60">
+            {siteConfig.url.replace(/^https?:\/\//, "")}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function AboutFounder() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const prefersReducedMotion = useReducedMotion();
+  const parallaxEnabled = isDesktop && !prefersReducedMotion;
+
+  // Subtle, section-wide numeral parallax — gated to desktop + motion-OK.
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  const numeralShift = useTransform(scrollYProgress, [0, 1], [24, -24]);
+
+  return (
+    <section
+      ref={sectionRef}
+      data-section-id="about-founder"
+      className={sectionPadding}
+    >
+      <div className={containerWidth}>
+        {/* Header */}
+        <ScrollReveal>
+          <p className={cn(monoKicker, "mb-5")}>The Founder</p>
+          <h2 className="max-w-3xl font-display text-4xl font-bold leading-[0.95] tracking-tight sm:text-5xl md:text-6xl">
             Built by a builder, for builders.
           </h2>
         </ScrollReveal>
 
-        {/* Desktop: sticky photo left + scrollable bio right */}
-        <div className="hidden gap-16 md:flex">
-          {/* Left: sticky photo */}
-          <div className="w-[45%]">
-            <div className="sticky top-[20%]">
-              <ScrollReveal>
-                <div className="relative aspect-[3/4] overflow-hidden rounded-2xl">
-                  <Image
-                    src="/images/about/founder-portrait.png"
-                    alt="Dustin Jasmin — Founder of Jaspire"
-                    fill
-                    sizes="(min-width: 768px) 45vw, 100vw"
-                    className="object-cover"
-                    priority
-                  />
-                  {/* Subtle vignette */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-                </div>
+        {/* Desktop: editorial zig-zag spread on a 12-col grid */}
+        <div className="mt-20 hidden md:block">
+          {bioBlocks.map((block, i) => {
+            const numeral = String(i + 1).padStart(2, "0");
+            const isEven = i % 2 === 1; // 02, 04 mirror
+            const direction = isEven ? "right" : "left";
 
-                {/* Name and title below photo */}
-                <div className="mt-6">
-                  <p className="text-lg font-bold tracking-tight text-[var(--text-primary)]">
-                    Dustin Jasmin
-                  </p>
-                  <p className="mt-1 font-mono text-xs uppercase tracking-[0.15em] text-[var(--text-tertiary)]">
-                    Founder & Creative Director
-                  </p>
+            return (
+              <ScrollReveal
+                key={block.kicker}
+                direction={direction}
+                delay={0.05 * i}
+                className="border-t border-[var(--surface-border)] first:border-t-0"
+              >
+                <div className="grid grid-cols-12 items-start gap-x-8 py-16">
+                  {/* ODD: title-left / content-right. EVEN: mirror. */}
+                  {isEven ? (
+                    <>
+                      {/* Content (left) */}
+                      <div className="order-2 col-span-6">
+                        <p className="max-w-md text-base leading-relaxed text-[var(--text-secondary)] lg:text-lg">
+                          {block.content}
+                        </p>
+                      </div>
+                      {/* Ghost numeral + kicker + title (right) */}
+                      <div className="order-1 col-span-5 col-start-8">
+                        <m.span
+                          aria-hidden
+                          style={parallaxEnabled ? { y: numeralShift } : undefined}
+                          className="block font-display text-7xl font-bold leading-none text-[var(--text-tertiary)] opacity-[0.32] lg:text-8xl"
+                        >
+                          {numeral}
+                        </m.span>
+                        <span className={cn(monoKicker, "mt-6 block text-[var(--primary)]")}>
+                          {block.kicker}
+                        </span>
+                        <h3 className="mt-3 font-display text-3xl font-bold tracking-tight lg:text-4xl">
+                          {block.title}
+                        </h3>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Ghost numeral + kicker + title (left) */}
+                      <div className="col-span-5">
+                        <m.span
+                          aria-hidden
+                          style={parallaxEnabled ? { y: numeralShift } : undefined}
+                          className="block font-display text-7xl font-bold leading-none text-[var(--text-tertiary)] opacity-[0.32] lg:text-8xl"
+                        >
+                          {numeral}
+                        </m.span>
+                        <span className={cn(monoKicker, "mt-6 block text-[var(--primary)]")}>
+                          {block.kicker}
+                        </span>
+                        <h3 className="mt-3 font-display text-3xl font-bold tracking-tight lg:text-4xl">
+                          {block.title}
+                        </h3>
+                      </div>
+                      {/* Content (right) */}
+                      <div className="col-span-6 col-start-7">
+                        <p className="max-w-md text-base leading-relaxed text-[var(--text-secondary)] lg:text-lg">
+                          {block.content}
+                        </p>
+                        {/* Brand plate slotted into the empty gutter beside rows 02/03 */}
+                        {i === 2 && (
+                          <ScrollReveal direction="up" delay={0.15} className="mt-12">
+                            <BrandPlate className="aspect-[3/4] w-full max-w-xs" />
+                          </ScrollReveal>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
               </ScrollReveal>
-            </div>
-          </div>
+            );
+          })}
 
-          {/* Right: scrollable bio blocks */}
-          <div className="w-[55%]">
-            {bioBlocks.map((block, i) => (
-              <ScrollReveal key={block.kicker} delay={i * 0.08}>
-                <div className="flex min-h-[50vh] flex-col justify-center py-12 first:pt-0 last:pb-0">
-                  <span className="mb-4 font-mono text-xs font-medium uppercase tracking-[0.2em] text-[var(--primary)]">
-                    {block.kicker}
-                  </span>
-                  <h3 className="mb-4 text-2xl font-bold tracking-tight md:text-3xl">
-                    {block.title}
-                  </h3>
-                  <p className="max-w-md text-base leading-relaxed text-[var(--text-secondary)] md:text-lg">
-                    {block.content}
-                  </p>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
-        </div>
-
-        {/* Mobile: stacked layout */}
-        <div className="md:hidden">
-          {/* Photo */}
-          <ScrollReveal>
-            <div className="relative mb-8 aspect-[4/3] overflow-hidden rounded-2xl">
-              <Image
-                src="/images/about/founder-portrait.png"
-                alt="Dustin Jasmin — Founder of Jaspire"
-                fill
-                sizes="100vw"
-                className="object-cover"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-            </div>
-
-            {/* Name and title */}
-            <div className="mb-10">
-              <p className="text-lg font-bold tracking-tight text-[var(--text-primary)]">
+          {/* Typographic sign-off */}
+          <ScrollReveal
+            direction="none"
+            duration={motionPresets.duration.slower}
+            className="border-t border-[var(--surface-border)]"
+          >
+            <m.div
+              initial={{ opacity: 0.8, scale: 0.98 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{
+                duration: motionPresets.duration.slower,
+                ease: motionPresets.ease.outExpo,
+              }}
+              className="pt-16"
+            >
+              <p className="font-display text-6xl font-bold tracking-tight text-[var(--text-primary)] lg:text-7xl">
                 Dustin Jasmin
               </p>
-              <p className="mt-1 font-mono text-xs uppercase tracking-[0.15em] text-[var(--text-tertiary)]">
-                Founder & Creative Director
-              </p>
-            </div>
+              <p className={cn(monoKicker, "mt-4")}>Founder &amp; Creative Director</p>
+              <m.div
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{
+                  duration: motionPresets.duration.slower,
+                  ease: motionPresets.ease.outExpo,
+                }}
+                className="mt-8 h-px origin-left bg-[var(--surface-border)]"
+              />
+            </m.div>
           </ScrollReveal>
+        </div>
 
-          {/* Bio blocks */}
-          <div className="space-y-12">
-            {bioBlocks.map((block, i) => (
-              <ScrollReveal key={block.kicker} delay={i * 0.08}>
-                <div>
-                  <span className="mb-3 inline-block font-mono text-xs font-medium uppercase tracking-[0.2em] text-[var(--primary)]">
-                    {block.kicker}
-                  </span>
-                  <h3 className="mb-3 text-xl font-bold tracking-tight">
-                    {block.title}
-                  </h3>
-                  <p className="text-base leading-relaxed text-[var(--text-secondary)]">
-                    {block.content}
-                  </p>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
+        {/* Mobile: single column */}
+        <div className="mt-14 md:hidden">
+          {bioBlocks.map((block, i) => {
+            const numeral = String(i + 1).padStart(2, "0");
+
+            return (
+              <div key={block.kicker}>
+                <ScrollReveal
+                  direction="up"
+                  delay={0.05 * i}
+                  className="border-t border-[var(--surface-border)] first:border-t-0"
+                >
+                  <div className="py-10">
+                    <span
+                      aria-hidden
+                      className="block font-display text-5xl font-bold leading-none text-[var(--text-tertiary)] opacity-[0.32]"
+                    >
+                      {numeral}
+                    </span>
+                    <span className={cn(monoKicker, "mt-4 block text-[var(--primary)]")}>
+                      {block.kicker}
+                    </span>
+                    <h3 className="mt-2 font-display text-2xl font-bold tracking-tight">
+                      {block.title}
+                    </h3>
+                    <p className="mt-3 text-base leading-relaxed text-[var(--text-secondary)]">
+                      {block.content}
+                    </p>
+                  </div>
+                </ScrollReveal>
+
+                {/* Brand plate band after block 02 */}
+                {i === 1 && (
+                  <ScrollReveal direction="up" delay={0.1} className="py-2">
+                    <BrandPlate className="aspect-[16/10] w-full" />
+                  </ScrollReveal>
+                )}
+              </div>
+            );
+          })}
+
+          {/* Typographic sign-off */}
+          <ScrollReveal
+            direction="none"
+            className="border-t border-[var(--surface-border)]"
+          >
+            <m.div
+              initial={{ opacity: 0.8, scale: 0.98 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{
+                duration: motionPresets.duration.slower,
+                ease: motionPresets.ease.outExpo,
+              }}
+              className="pt-10"
+            >
+              <p className="font-display text-5xl font-bold tracking-tight text-[var(--text-primary)]">
+                Dustin Jasmin
+              </p>
+              <p className={cn(monoKicker, "mt-3")}>Founder &amp; Creative Director</p>
+              <m.div
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{
+                  duration: motionPresets.duration.slower,
+                  ease: motionPresets.ease.outExpo,
+                }}
+                className="mt-6 h-px origin-left bg-[var(--surface-border)]"
+              />
+            </m.div>
+          </ScrollReveal>
         </div>
       </div>
     </section>
